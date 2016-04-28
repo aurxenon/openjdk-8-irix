@@ -23,6 +23,12 @@
 # questions.
 #
 
+#
+# This file has been modified by Loongson Technology in 2013. These
+# modifications are Copyright (c) 2013 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 # Shell script for a fast parallel forest command
 command="$1"
 pull_extra_base="$2"
@@ -144,7 +150,9 @@ for i in ${repos} ${repos_extra} ; do
   (
     (
       if [ "${command}" = "clone" -o "${command}" = "fclone" ] ; then
-        pull_newrepo="`echo ${pull_base}/${i} | sed -e 's@\([^:]/\)//*@\1@g'`"
+        # 2013.2.27 Jin: fix the repo url for ssh
+        #pull_newrepo="`echo ${pull_base}/${i} | sed -e 's@\([^:]/\)//*@\1@g'`"
+        pull_newrepo=${pull_base}/$i
         echo hg clone ${pull_newrepo} ${i}
         path="`dirname ${i}`"
         if [ "${path}" != "." ] ; then
@@ -158,13 +166,13 @@ for i in ${repos} ${repos_extra} ; do
             sleep 5
           done
         fi
-        (PYTHONUNBUFFERED=true hg clone ${pull_newrepo} ${i}; echo "$?" > ${tmp}/${repopidfile}.pid.rc )&
+        (PYTHONUNBUFFERED=true hg clone ${pull_newrepo} ${i}; echo "$?" > ${tmp}/${repopidfile}.pid.rc )
       else
         echo "cd ${i} && hg $*"
-        cd ${i} && (PYTHONUNBUFFERED=true hg "$@"; echo "$?" > ${tmp}/${repopidfile}.pid.rc )&
+        cd ${i} && (PYTHONUNBUFFERED=true hg "$@"; echo "$?" > ${tmp}/${repopidfile}.pid.rc )
       fi
       echo $! > ${tmp}/${repopidfile}.pid
-    ) 2>&1 | sed -e "s@^@${reponame}:   @") &
+    ) 2>&1 | sed -e "s@^@${reponame}:   @") 
 
   if [ `expr ${n} '%' ${at_a_time}` -eq 0 ] ; then
     sleep 2

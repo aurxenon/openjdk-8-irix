@@ -14,6 +14,12 @@
 ## M4sh Initialization. ##
 ## -------------------- ##
 
+#
+# This file has been modified by Loongson Technology in 2015. These
+# modifications are Copyright (c) 2015 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 # Be more Bourne compatible
 DUALCASE=1; export DUALCASE # for MKS sh
 if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then :
@@ -3868,7 +3874,7 @@ fi
 #CUSTOM_AUTOCONF_INCLUDE
 
 # Do not change or remove the following line, it is needed for consistency checks:
-DATE_WHEN_GENERATED=1403797630
+DATE_WHEN_GENERATED=1410971760
 
 ###############################################################################
 #
@@ -6860,6 +6866,12 @@ test -n "$target_alias" &&
       VAR_CPU_BITS=64
       VAR_CPU_ENDIAN=big
       ;;
+    mips64el)
+      VAR_CPU=mips64
+      VAR_CPU_ARCH=mips
+      VAR_CPU_BITS=64
+      VAR_CPU_ENDIAN=little
+      ;;
     *)
       as_fn_error $? "unsupported cpu $build_cpu" "$LINENO" 5
       ;;
@@ -6990,6 +7002,12 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUILD_CPU" >&6; }
       VAR_CPU_ARCH=sparc
       VAR_CPU_BITS=64
       VAR_CPU_ENDIAN=big
+      ;;
+    mips64el)
+      VAR_CPU=mips64
+      VAR_CPU_ARCH=mips
+      VAR_CPU_BITS=64
+      VAR_CPU_ENDIAN=little
       ;;
     *)
       as_fn_error $? "unsupported cpu $host_cpu" "$LINENO" 5
@@ -7145,6 +7163,10 @@ $as_echo "$COMPILE_TYPE" >&6; }
   elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     # On all platforms except macosx, we replace x86_64 with amd64.
     OPENJDK_TARGET_CPU_OSARCH="amd64"
+  elif test "x$OPENJDK_TARGET_OS" = xlinux && test "x$OPENJDK_TARGET_CPU" = xmips64; then
+    # 2013/11/13 Jin: to be exactly same with OpenJDK 6(mips64)
+    #   System.getProperty("os.arch"): mips64 -> mips64el
+    OPENJDK_TARGET_CPU_OSARCH="mips64el"
   fi
 
 

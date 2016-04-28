@@ -23,6 +23,12 @@
 # questions.
 #
 
+#
+# This file has been modified by Loongson Technology in 2015. These
+# modifications are Copyright (c) 2015 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 LIBJSOUND_SRC_DIRS := \
     $(JDK_TOPDIR)/src/share/native/com/sun/media/sound \
     $(JDK_TOPDIR)/src/$(OPENJDK_TARGET_OS_API_DIR)/native/com/sun/media/sound
@@ -133,6 +139,11 @@ else
   endif
 
   ifeq ($(OPENJDK_TARGET_CPU), ppc)
+    LIBJSOUND_CFLAGS += -DX_ARCH=X_PPC
+  endif
+
+  # 2013/11/13 Jin: add for configure mode
+  ifeq ($(OPENJDK_TARGET_CPU), mips64)
     LIBJSOUND_CFLAGS += -DX_ARCH=X_PPC
   endif
 

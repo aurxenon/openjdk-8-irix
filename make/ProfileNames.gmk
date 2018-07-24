@@ -23,6 +23,12 @@
 # questions.
 #
 
+#
+# This file has been modified by Loongson Technology in 2018. These
+# modifications are Copyright (c) 2018 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 # This was split out from Profiles.gmk to allow GenSrcMisc.gmk to include it
 # without attempting to generate lists for output files that don't exist yet
 
@@ -61,3 +67,14 @@ profile_version_number = $(patsubst $(JDK_OUTPUTDIR)/gen_profile_%/$(VERSION_JAV
 # Function to go from a profile Version.java target to profile name. If not
 # a profile version target then we need a number that maps to an empty name
 profile_version_name = $(word $(if $(filter-out $(call profile_version_number, $(1)), $(1)), $(call profile_version_number, $(1)), $(words $(PROFILE_NAMES) extra)), $(PROFILE_NAMES))
+
+VER = 8
+ifeq ($(HOST_NAME), )
+  HOST_NAME=unknown
+endif
+ifeq ($(BUILDER_NAME), )
+  BUILDER_NAME=unknown
+endif
+HOST_NAME_STRING = -$(HOST_NAME)
+BUILDER_NAME_STRING = -$(BUILDER_NAME)
+LOONGSON_RUNTIME_NAME = Loongson $(VER)$(HOST_NAME_STRING)$(BUILDER_NAME_STRING)

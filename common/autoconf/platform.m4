@@ -328,7 +328,7 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
   elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     # On all platforms except macosx, we replace x86_64 with amd64.
     OPENJDK_TARGET_CPU_OSARCH="amd64"
-  elif test "x$OPENJDK_TARGET_OS" = xlinux && test "x$OPENJDK_TARGET_CPU" = xmips64; then
+  elif test "x$OPENJDK_TARGET_OS" = xlinux && test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
     # Jin: to be exactly same with OpenJDK 6(mips64)
     # System.getProperty("os.arch"): mips64 -> mips64el
     OPENJDK_TARGET_CPU_OSARCH="mips64el"
@@ -352,6 +352,9 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
     elif test "x$OPENJDK_TARGET_CPU_ARCH" = xx86; then
       OPENJDK_TARGET_CPU_JLI_CFLAGS="$OPENJDK_TARGET_CPU_JLI_CFLAGS -DLIBARCH32NAME='\"i386\"' -DLIBARCH64NAME='\"amd64\"'"
     fi
+  fi
+  if test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    OPENJDK_TARGET_CPU_JLI_CFLAGS="$OPENJDK_TARGET_CPU_JLI_CFLAGS -DLIBARCH32NAME='\"mips32el\"' -DLIBARCH64NAME='\"mips64el\"'"
   fi
   AC_SUBST(OPENJDK_TARGET_CPU_JLI_CFLAGS)
 

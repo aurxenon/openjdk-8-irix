@@ -7191,6 +7191,8 @@ $as_echo "$COMPILE_TYPE" >&6; }
     OPENJDK_TARGET_CPU_LEGACY_LIB="i386"
   elif test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     OPENJDK_TARGET_CPU_LEGACY_LIB="amd64"
+  elif test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    OPENJDK_TARGET_CPU_LEGACY_LIB="mips64el"
   fi
 
 
@@ -7237,6 +7239,8 @@ $as_echo "$COMPILE_TYPE" >&6; }
   elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     # On all platforms except macosx, we replace x86_64 with amd64.
     OPENJDK_TARGET_CPU_JLI="amd64"
+  elif test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    OPENJDK_TARGET_CPU_JLI="mips64el"
   fi
   # Now setup the -D flags for building libjli.
   OPENJDK_TARGET_CPU_JLI_CFLAGS="-DLIBARCHNAME='\"$OPENJDK_TARGET_CPU_JLI\"'"

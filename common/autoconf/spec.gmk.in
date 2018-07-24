@@ -23,6 +23,12 @@
 # questions.
 #
 
+#
+# This file has been modified by Loongson Technology in 2018. These
+# modifications are Copyright (c) 2018 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 # Configured @DATE_WHEN_CONFIGURED@ to build
 # for target system @OPENJDK_TARGET_OS@-@OPENJDK_TARGET_CPU@
 #   (called @OPENJDK_TARGET_AUTOCONF_NAME@ by autoconf)
@@ -107,6 +113,11 @@ OPENJDK_BUILD_CPU_ENDIAN:=@OPENJDK_BUILD_CPU_ENDIAN@
 # Legacy OS values for use in release file.
 REQUIRED_OS_NAME:=@REQUIRED_OS_NAME@
 REQUIRED_OS_VERSION:=@REQUIRED_OS_VERSION@
+
+# Build OS and host values for use in Loongson OpenJDK release
+BUILDER_ID = @BUILDER_ID@
+BUILDER_NAME = @BUILDER_NAME@
+HOST_NAME = @HOST_NAME@
 
 @SET_OPENJDK@
 LIBM:=-lm

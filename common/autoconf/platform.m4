@@ -23,6 +23,12 @@
 # questions.
 #
 
+#
+# This file has been modified by Loongson Technology in 2018. These
+# modifications are Copyright (c) 2018 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 # Support macro for PLATFORM_EXTRACT_TARGET_AND_BUILD.
 # Converts autoconf style CPU name to OpenJDK style, into
 # VAR_CPU, VAR_CPU_ARCH, VAR_CPU_BITS and VAR_CPU_ENDIAN.
@@ -95,6 +101,12 @@ AC_DEFUN([PLATFORM_EXTRACT_VARS_FROM_CPU],
       VAR_CPU_ARCH=sparc
       VAR_CPU_BITS=64
       VAR_CPU_ENDIAN=big
+      ;;
+    mips64el)
+      VAR_CPU=mips64
+      VAR_CPU_ARCH=mips
+      VAR_CPU_BITS=64
+      VAR_CPU_ENDIAN=little
       ;;
     *)
       AC_MSG_ERROR([unsupported cpu $1])
@@ -314,6 +326,10 @@ AC_DEFUN([PLATFORM_SETUP_LEGACY_VARS],
   elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     # On all platforms except macosx, we replace x86_64 with amd64.
     OPENJDK_TARGET_CPU_OSARCH="amd64"
+  elif test "x$OPENJDK_TARGET_OS" = xlinux && test "x$OPENJDK_TARGET_CPU" = xmips64; then
+    # Jin: to be exactly same with OpenJDK 6(mips64)
+    # System.getProperty("os.arch"): mips64 -> mips64el
+    OPENJDK_TARGET_CPU_OSARCH="mips64el"
   fi
   AC_SUBST(OPENJDK_TARGET_CPU_OSARCH)
 
@@ -545,4 +561,40 @@ AC_DEFUN_ONCE([PLATFORM_SETUP_OPENJDK_TARGET_ENDIANNESS],
   if test "x$ENDIAN" != "x$OPENJDK_TARGET_CPU_ENDIAN"; then
     AC_MSG_ERROR([The tested endian in the target ($ENDIAN) differs from the endian expected to be found in the target ($OPENJDK_TARGET_CPU_ENDIAN)])
   fi
+])
+
+AC_DEFUN([GET_BUILDER_AND_HOST_DATA],
+[
+BUILDER_NAME="$build_os"
+BUILDER_ID="Custom build ($(date))"
+if test -f /etc/issue; then
+  etc_issue_info=`cat /etc/issue`
+  if test -n "$etc_issue_info"; then
+    BUILDER_NAME=`cat /etc/issue | head -n 1 | cut -d " " -f 1`
+  fi
+fi
+if test -f /etc/neokylin-release; then
+  etc_issue_info=`cat /etc/neokylin-release`
+  if test -n "$etc_issue_info"; then
+    BUILDER_NAME=`cat /etc/neokylin-release | head -n 1 | cut -d " " -f 1`
+  fi
+fi
+if test -z "$BUILDER_NAME"; then
+  BUILDER_NAME="unknown"
+fi
+if test -n "$OPENJDK_TARGET_CPU_OSARCH"; then
+  HOST_NAME="$OPENJDK_TARGET_CPU_OSARCH"
+else
+  HOST_NAME="unknown"
+fi
+if test -f "/usr/bin/cpp"; then
+  # gcc_with_arch_info=`gcc -v 2>&1 | grep '\-\-with-arch=' | sed 's/.*--with-arch=//;s/ .*$//'`
+  gcc_with_arch_info=`cpp -dM /dev/null | grep '\<_MIPS_ARCH\>' | sed 's/^#define _MIPS_ARCH "//;s/"$//'`
+  if test -n "$gcc_with_arch_info"; then
+    HOST_NAME="$gcc_with_arch_info"
+  fi
+fi
+AC_SUBST(BUILDER_ID)
+AC_SUBST(BUILDER_NAME)
+AC_SUBST(HOST_NAME)
 ])

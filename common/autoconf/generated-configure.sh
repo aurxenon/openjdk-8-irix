@@ -712,6 +712,9 @@ STATIC_LIBRARY
 SHARED_LIBRARY
 OBJ_SUFFIX
 COMPILER_NAME
+HOST_NAME
+BUILDER_NAME
+BUILDER_ID
 JT_HOME
 JTREGEXE
 ac_ct_OBJDUMP
@@ -3701,6 +3704,12 @@ fi
 # questions.
 #
 
+#
+# This file has been modified by Loongson Technology in 2018. These
+# modifications are Copyright (c) 2018 Loongson Technology, and are made
+# available on the same license terms set forth above.
+#
+
 # Support macro for PLATFORM_EXTRACT_TARGET_AND_BUILD.
 # Converts autoconf style CPU name to OpenJDK style, into
 # VAR_CPU, VAR_CPU_ARCH, VAR_CPU_BITS and VAR_CPU_ENDIAN.
@@ -3737,6 +3746,8 @@ fi
 
 # Support macro for PLATFORM_SETUP_OPENJDK_TARGET_BITS.
 # Add -mX to various FLAGS variables.
+
+
 
 
 
@@ -3912,7 +3923,7 @@ fi
 #CUSTOM_AUTOCONF_INCLUDE
 
 # Do not change or remove the following line, it is needed for consistency checks:
-DATE_WHEN_GENERATED=1523388104
+DATE_WHEN_GENERATED=1532592675
 
 ###############################################################################
 #
@@ -6910,6 +6921,12 @@ test -n "$target_alias" &&
       VAR_CPU_BITS=64
       VAR_CPU_ENDIAN=big
       ;;
+    mips64el)
+      VAR_CPU=mips64
+      VAR_CPU_ARCH=mips
+      VAR_CPU_BITS=64
+      VAR_CPU_ENDIAN=little
+      ;;
     *)
       as_fn_error $? "unsupported cpu $build_cpu" "$LINENO" 5
       ;;
@@ -7047,6 +7064,12 @@ $as_echo "$OPENJDK_BUILD_OS-$OPENJDK_BUILD_CPU" >&6; }
       VAR_CPU_BITS=64
       VAR_CPU_ENDIAN=big
       ;;
+    mips64el)
+      VAR_CPU=mips64
+      VAR_CPU_ARCH=mips
+      VAR_CPU_BITS=64
+      VAR_CPU_ENDIAN=little
+      ;;
     *)
       as_fn_error $? "unsupported cpu $host_cpu" "$LINENO" 5
       ;;
@@ -7168,6 +7191,8 @@ $as_echo "$COMPILE_TYPE" >&6; }
     OPENJDK_TARGET_CPU_LEGACY_LIB="i386"
   elif test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     OPENJDK_TARGET_CPU_LEGACY_LIB="amd64"
+  elif test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    OPENJDK_TARGET_CPU_LEGACY_LIB="mips64el"
   fi
 
 
@@ -7201,6 +7226,10 @@ $as_echo "$COMPILE_TYPE" >&6; }
   elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     # On all platforms except macosx, we replace x86_64 with amd64.
     OPENJDK_TARGET_CPU_OSARCH="amd64"
+  elif test "x$OPENJDK_TARGET_OS" = xlinux && test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    # Jin: to be exactly same with OpenJDK 6(mips64)
+    # System.getProperty("os.arch"): mips64 -> mips64el
+    OPENJDK_TARGET_CPU_OSARCH="mips64el"
   fi
 
 
@@ -7210,6 +7239,8 @@ $as_echo "$COMPILE_TYPE" >&6; }
   elif test "x$OPENJDK_TARGET_OS" != xmacosx && test "x$OPENJDK_TARGET_CPU" = xx86_64; then
     # On all platforms except macosx, we replace x86_64 with amd64.
     OPENJDK_TARGET_CPU_JLI="amd64"
+  elif test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    OPENJDK_TARGET_CPU_JLI="mips64el"
   fi
   # Now setup the -D flags for building libjli.
   OPENJDK_TARGET_CPU_JLI_CFLAGS="-DLIBARCHNAME='\"$OPENJDK_TARGET_CPU_JLI\"'"
@@ -7219,6 +7250,9 @@ $as_echo "$COMPILE_TYPE" >&6; }
     elif test "x$OPENJDK_TARGET_CPU_ARCH" = xx86; then
       OPENJDK_TARGET_CPU_JLI_CFLAGS="$OPENJDK_TARGET_CPU_JLI_CFLAGS -DLIBARCH32NAME='\"i386\"' -DLIBARCH64NAME='\"amd64\"'"
     fi
+  fi
+  if test "x$OPENJDK_TARGET_CPU" = xmips64 && test "x$OPENJDK_TARGET_CPU_ENDIAN" = xlittle; then
+    OPENJDK_TARGET_CPU_JLI_CFLAGS="$OPENJDK_TARGET_CPU_JLI_CFLAGS -DLIBARCH32NAME='\"mips32el\"' -DLIBARCH64NAME='\"mips64el\"'"
   fi
 
 
@@ -29339,6 +29373,40 @@ $as_echo "$ac_cv_c_bigendian" >&6; }
   if test "x$ENDIAN" != "x$OPENJDK_TARGET_CPU_ENDIAN"; then
     as_fn_error $? "The tested endian in the target ($ENDIAN) differs from the endian expected to be found in the target ($OPENJDK_TARGET_CPU_ENDIAN)" "$LINENO" 5
   fi
+
+
+BUILDER_NAME="$build_os"
+BUILDER_ID="Custom build ($(date))"
+if test -f /etc/issue; then
+  etc_issue_info=`cat /etc/issue`
+  if test -n "$etc_issue_info"; then
+    BUILDER_NAME=`cat /etc/issue | head -n 1 | cut -d " " -f 1`
+  fi
+fi
+if test -f /etc/neokylin-release; then
+  etc_issue_info=`cat /etc/neokylin-release`
+  if test -n "$etc_issue_info"; then
+    BUILDER_NAME=`cat /etc/neokylin-release | head -n 1 | cut -d " " -f 1`
+  fi
+fi
+if test -z "$BUILDER_NAME"; then
+  BUILDER_NAME="unknown"
+fi
+if test -n "$OPENJDK_TARGET_CPU_OSARCH"; then
+  HOST_NAME="$OPENJDK_TARGET_CPU_OSARCH"
+else
+  HOST_NAME="unknown"
+fi
+if test -f "/usr/bin/cpp"; then
+  # gcc_with_arch_info=`gcc -v 2>&1 | grep '\-\-with-arch=' | sed 's/.*--with-arch=//;s/ .*$//'`
+  gcc_with_arch_info=`cpp -dM /dev/null | grep '\<_MIPS_ARCH\>' | sed 's/^#define _MIPS_ARCH "//;s/"$//'`
+  if test -n "$gcc_with_arch_info"; then
+    HOST_NAME="$gcc_with_arch_info"
+  fi
+fi
+
+
+
 
 
 # Configure flags for the tools

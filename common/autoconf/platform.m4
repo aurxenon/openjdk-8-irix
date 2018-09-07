@@ -580,6 +580,12 @@ if test -f /etc/issue; then
     BUILDER_NAME=`cat /etc/issue | head -n 1 | cut -d " " -f 1`
   fi
 fi
+if test -f /etc/redhat-release; then
+  etc_issue_info=`cat /etc/redhat-release`
+  if test -n "$etc_issue_info"; then
+    BUILDER_NAME=`cat /etc/redhat-release | head -n 1 | cut -d " " -f 1`
+  fi
+fi
 if test -f /etc/neokylin-release; then
   etc_issue_info=`cat /etc/neokylin-release`
   if test -n "$etc_issue_info"; then
